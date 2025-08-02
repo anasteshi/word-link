@@ -21,7 +21,7 @@ export default class WordBuilder {
 
 	update() {
 		for (const letter of this.letters) {
-			letter.rewriteLetter()
+			letter.updateLetter(this.letters, this.canvas.width, this.canvas.height)
 		}
 	}
 

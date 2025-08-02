@@ -10,9 +10,19 @@ export default class Letter {
 		this.y = y
 	}
 
-	rewriteLetter(letters, width, height) {
+	updateLetter(letters, width, height) {
 		this.x += this.vx
 		this.y += this.vy
+
+		if (this.x < this.size || this.x > width - this.size) {
+			this.vx *= -0.8
+		}
+
+		if (this.y < this.size || this.y > height - this.size) {
+			this.vy *= -0.8
+		}
+
+
 	}
 
 	draw(ctx) {
