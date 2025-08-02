@@ -5,6 +5,8 @@ export default class WordBuilder {
 		this.canvas = canvas
 		this.ctx = canvas.getContext("2d")
 		this.letters = []
+		this.currentWordSequence = 0
+		this.lastTypedTime = 0
 		this.resize()
 	}
 
@@ -14,9 +16,15 @@ export default class WordBuilder {
 	}
 
 	addLetter(letter) {
-		const x = Math.random() * this.canvas.width * 0.8 + this.canvas.width * 0.1 
-		const y = Math.random() * this.canvas.height * 0.8 + this.canvas.height * 0.1 
-		this.letters.push(new Letter(letter, x, y))
+		const now = performance.now()
+
+		if (now - this.lastTypedTime > 1500) { // If it's been over 1.5 seconds, start a new sequence
+			this.currentWordSequence++
+		}
+		this.lastTypedTime = now
+		const x = Math.random() * this.canvas.width * 0.8 + this.canvas.width * 0.1
+		const y = Math.random() * this.canvas.height * 0.8 + this.canvas.height * 0.1
+		this.letters.push(new Letter(letter, x, y, this.currentWordSequence))
 	}
 
 	update() {

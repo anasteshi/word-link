@@ -4,10 +4,12 @@ export default class Letter {
 	size = 40
 	color = "black"
 
-	constructor(letter, x, y) {
+	constructor(letter, x, y, wordSequenceId) {
 		this.letter = letter
 		this.x = x
 		this.y = y
+		this.wordSequenceId = wordSequenceId
+		this.color = `hsl(${(this.wordSequenceId * 40) % 360}, 80%, 60%)` // Give each sequence a unique, consistent color
 	}
 
 	updateLetter(letters, width, height) {
