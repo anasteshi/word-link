@@ -14,8 +14,8 @@ export default class WordBuilder {
 	}
 
 	addLetter(letter) {
-		const x = Math.random() * this.canvas.width
-		const y = Math.random() * this.canvas.height
+		const x = Math.random() * this.canvas.width * 0.8 + this.canvas.width * 0.1 
+		const y = Math.random() * this.canvas.height * 0.8 + this.canvas.height * 0.1 
 		this.letters.push(new Letter(letter, x, y))
 	}
 

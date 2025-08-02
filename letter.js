@@ -14,12 +14,14 @@ export default class Letter {
 		this.x += this.vx
 		this.y += this.vy
 
-		if (this.x < this.size || this.x > width - this.size) {
-			this.vx *= -0.8
+		const radius = this.size / 2
+
+		if (this.x < radius || this.x > width - radius) {
+			this.vx *= -1
 		}
 
-		if (this.y < this.size || this.y > height - this.size) {
-			this.vy *= -0.8
+		if (this.y < radius || this.y > height - radius) {
+			this.vy *= -1
 		}
 
 		for (const otherLetter of letters) {
@@ -31,8 +33,8 @@ export default class Letter {
 			const dy = this.y - otherLetter.y
 			const distance = Math.hypot(dx, dy)
 
-			if (distance < 40) {
-				const force = (40 - distance) * 0.05
+			if (distance < this.size) {
+				const force = (this.size - distance) * 0.05
 
 				this.vx += (dx / distance) * force
 				this.vy += (dy / distance) * force
