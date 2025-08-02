@@ -2,14 +2,13 @@ export default class Letter {
 	vx = (Math.random() - 0.5) * 2
 	vy = (Math.random() - 0.5) * 2
 	size = 40
-	color = "black"
 
-	constructor(letter, x, y, wordSequenceId) {
+	constructor(letter, x, y, sequenceId) {
 		this.letter = letter
 		this.x = x
 		this.y = y
-		this.wordSequenceId = wordSequenceId
-		this.color = `hsl(${(this.wordSequenceId * 40) % 360}, 80%, 60%)` // Give each sequence a unique, consistent color
+		this.sequenceId = sequenceId
+		this.color = `hsl(${(this.sequenceId * 40) % 360}, 80%, 60%)` // Give each sequence a unique, consistent color
 	}
 
 	updateLetter(letters, width, height) {
