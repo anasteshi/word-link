@@ -38,12 +38,13 @@ export default class WordBuilder {
 		for (const letter of this.letters) {
 			letter.updateLetter(this.letters, this.canvas.width, this.canvas.height)
 		}
+		this.letters = this.letters.filter((letter) => !letter.toBeRemoved)
 	}
 
 	draw() {
 		this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height)
 		for (const letter of this.letters) {
-			letter.draw(this.ctx)
+			letter.drawLetter(this.ctx)
 		}
 	}
 
@@ -58,10 +59,10 @@ export default class WordBuilder {
 	}
 
 	validate(sequenceId) {
-		const word = this.letters
-			.filter((letter) => letter.sequenceId === sequenceId)
-			.map((letter) => letter.letter)
-			.join("")
+		const partsOfWord = this.letters.filter(
+			(letter) => letter.sequenceId === sequenceId
+		)
+		const word = partsOfWord.map((letter) => letter.letter).join("")
 
 		if (word.length < 0) {
 			return
@@ -69,8 +70,14 @@ export default class WordBuilder {
 
 		if (this.dictionary.has(word.toLowerCase())) {
 			console.log(`SUCCESS: ${word}`)
+			for (const letter of partsOfWord) {
+				letter.isPartOfWord = true
+			}
 		} else {
 			console.log(`FAILURE! ${word} is not a word`)
+			for (const letter of partsOfWord) {
+				letter.invalidWord = true
+			}
 		}
 	}
 }

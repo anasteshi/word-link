@@ -2,6 +2,10 @@ export default class Letter {
 	vx = (Math.random() - 0.5) * 2
 	vy = (Math.random() - 0.5) * 2
 	size = 40
+	alpha = 1
+	isPartOfWord = false
+	toBeRemoved = false
+	invalidWord = false
 
 	constructor(letter, x, y, sequenceId) {
 		this.letter = letter
@@ -12,6 +16,13 @@ export default class Letter {
 	}
 
 	updateLetter(letters, width, height) {
+		if (this.invalidWord) {
+			this.alpha -= 0.02
+			if (this.alpha <= 0) {
+				this.toBeRemoved = true
+			}
+		}
+
 		this.x += this.vx
 		this.y += this.vy
 
@@ -46,9 +57,21 @@ export default class Letter {
 		this.vy *= 0.98
 	}
 
-	draw(ctx) {
-		ctx.fillStyle = this.color
+	drawLetter(ctx) {
+		if (this.isPartOfWord) {
+			ctx.fillStyle = "gold"
+			ctx.shadowColor = "yellow"
+			ctx.shadowBlur = 10
+		} else {
+			ctx.fillStyle = this.color
+			ctx.shadowColor = "transparent"
+			ctx.shadowBlur = 0
+		}
+		ctx.globalAlpha = this.alpha
 		ctx.font = `${this.size}px Times New Roman`
 		ctx.fillText(this.letter, this.x, this.y)
+		ctx.shadowColor = "transparent"
+		ctx.shadowBlur = 0
+		ctx.globalAlpha = 1
 	}
 }
