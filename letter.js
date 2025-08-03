@@ -59,16 +59,15 @@ export default class Letter {
 
 	drawLetter(ctx) {
 		if (this.isPartOfWord) {
-			ctx.fillStyle = "gold"
 			ctx.shadowColor = "yellow"
 			ctx.shadowBlur = 10
 		} else {
-			ctx.fillStyle = this.color
 			ctx.shadowColor = "transparent"
 			ctx.shadowBlur = 0
 		}
 		ctx.globalAlpha = this.alpha
 		ctx.font = `${this.size}px Times New Roman`
+		ctx.fillStyle = this.color
 		ctx.fillText(this.letter, this.x, this.y)
 		ctx.shadowColor = "transparent"
 		ctx.shadowBlur = 0

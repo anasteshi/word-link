@@ -2,15 +2,17 @@ import Letter from "./letter.js"
 
 export default class WordBuilder {
 	letters = []
+	guessedWords = []
 	currentWordSequence = 0
 	lastTypedTime = 0
-	dictionary = new Set(["hello", "world", "test", "word", "cat", "dog"])
 	wordCheckTimeout = null
+	dictionary = new Set()
 
 	constructor(canvas) {
 		this.canvas = canvas
 		this.ctx = canvas.getContext("2d")
 		this.resize()
+		this.loadDictionary()
 	}
 
 	resize() {
@@ -68,8 +70,9 @@ export default class WordBuilder {
 			return
 		}
 
-		if (this.dictionary.has(word.toLowerCase())) {
+		if (this.dictionary.has(word.toLowerCase()) && !this.guessedWords.includes(word)) {
 			console.log(`SUCCESS: ${word}`)
+			this.guessedWords.push(word)
 			for (const letter of partsOfWord) {
 				letter.isPartOfWord = true
 			}
@@ -79,5 +82,28 @@ export default class WordBuilder {
 				letter.invalidWord = true
 			}
 		}
+	}
+
+	loadDictionary() {
+		fetch(
+			"https://raw.githubusercontent.com/dwyl/english-words/master/words_alpha.txt"
+		)
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error("Something went wrong while loading the dictionary")
+				}
+				return response.text()
+			})
+			.then((text) => {
+				const words = text
+					.split("\n")
+					.map((word) => word.trim().toLowerCase())
+					.filter((word) => word.length > 0)
+
+				this.dictionary = new Set(words)
+			})
+			.catch((error) => {
+				console.log("Error loading dictionary:", error)
+			})
 	}
 }
