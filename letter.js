@@ -19,33 +19,25 @@ export default class Letter {
 	}
 
 	updateLetter(letters, width, height) {
-		if (this.invalidWord) {
-			this.alpha -= 0.02
-			if (this.alpha <= 0) {
-				this.toBeRemoved = true
-			}
-		}
-
+		this.handleState()
+		
 		if (this.hasTarget) {
-			const dx = this.targetX - this.x
-			const dy = this.targetY - this.y
-			const distance = Math.hypot(dx, dy)
-
-			if (distance > 1) {
-				const speed = distance * 0.1
-				this.vx = (dx / distance) * speed
-				this.vy = (dy / distance) * speed
-			} else {
-				this.x = this.targetX
-				this.y = this.targetY
-				this.vx = 0
-				this.vy = 0
-			}
+			this.handleTargetMovement()
+		} else {
+			this.handlePhysics(letters, width, height)
 		}
 
+		this.move()
+	}
+
+	move() {
 		this.x += this.vx
 		this.y += this.vy
+		this.vx *= 0.98
+		this.vy *= 0.98
+	}
 
+	handlePhysics(letters, width, height) {
 		const radius = this.size / 2
 
 		if (this.x < radius || this.x > width - radius) {
@@ -57,7 +49,7 @@ export default class Letter {
 		}
 
 		for (const otherLetter of letters) {
-			if (otherLetter == this) {
+			if (otherLetter === this) {
 				continue
 			}
 
@@ -72,9 +64,32 @@ export default class Letter {
 				this.vy += (dy / distance) * force
 			}
 		}
+	}
 
-		this.vx *= 0.98
-		this.vy *= 0.98
+	handleTargetMovement() {
+		const dx = this.targetX - this.x
+		const dy = this.targetY - this.y
+		const distance = Math.hypot(dx, dy)
+
+		if (distance > 1) {
+			const speed = distance * 0.1
+			this.vx = (dx / distance) * speed
+			this.vy = (dy / distance) * speed
+		} else {
+			this.x = this.targetX
+			this.y = this.targetY
+			this.vx = 0
+			this.vy = 0
+		}
+	}
+
+	handleState() {
+		if (this.invalidWord) {
+			this.alpha -= 0.02
+			if (this.alpha <= 0) {
+				this.toBeRemoved = true
+			}
+		}
 	}
 
 	drawLetter(ctx) {

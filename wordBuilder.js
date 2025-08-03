@@ -2,11 +2,11 @@ import Letter from "./letter.js"
 
 export default class WordBuilder {
 	letters = []
-	guessedWords = []
 	currentWordSequence = 0
 	lastTypedTime = 0
 	wordCheckTimeout = null
 	dictionary = new Set()
+	guessedWords = new Set()
 
 	constructor(canvas) {
 		this.canvas = canvas
@@ -66,22 +66,17 @@ export default class WordBuilder {
 		)
 		const word = partsOfWord.map((letter) => letter.letter).join("")
 
-		if (word.length < 0) {
-			return
-		}
-
 		if (
 			this.dictionary.has(word.toLowerCase()) &&
-			!this.guessedWords.includes(word)
+			!(word.length < 3) &&
+			!this.guessedWords.has(word)
 		) {
-			console.log(`SUCCESS: ${word}`)
-			this.guessedWords.push(word)
 			for (const letter of partsOfWord) {
 				letter.isPartOfWord = true
 			}
+			this.guessedWords.add(word)
 			this.snapWordIntoPlace(partsOfWord)
 		} else {
-			console.log(`FAILURE! ${word} is not a word`)
 			for (const letter of partsOfWord) {
 				letter.invalidWord = true
 			}
