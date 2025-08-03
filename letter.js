@@ -6,6 +6,9 @@ export default class Letter {
 	isPartOfWord = false
 	toBeRemoved = false
 	invalidWord = false
+	targetX = null
+	targetY = null
+	hasTarget = false
 
 	constructor(letter, x, y, sequenceId) {
 		this.letter = letter
@@ -20,6 +23,23 @@ export default class Letter {
 			this.alpha -= 0.02
 			if (this.alpha <= 0) {
 				this.toBeRemoved = true
+			}
+		}
+
+		if (this.hasTarget) {
+			const dx = this.targetX - this.x
+			const dy = this.targetY - this.y
+			const distance = Math.hypot(dx, dy)
+
+			if (distance > 1) {
+				const speed = distance * 0.1
+				this.vx = (dx / distance) * speed
+				this.vy = (dy / distance) * speed
+			} else {
+				this.x = this.targetX
+				this.y = this.targetY
+				this.vx = 0
+				this.vy = 0
 			}
 		}
 

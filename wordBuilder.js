@@ -70,12 +70,16 @@ export default class WordBuilder {
 			return
 		}
 
-		if (this.dictionary.has(word.toLowerCase()) && !this.guessedWords.includes(word)) {
+		if (
+			this.dictionary.has(word.toLowerCase()) &&
+			!this.guessedWords.includes(word)
+		) {
 			console.log(`SUCCESS: ${word}`)
 			this.guessedWords.push(word)
 			for (const letter of partsOfWord) {
 				letter.isPartOfWord = true
 			}
+			this.snapWordIntoPlace(partsOfWord)
 		} else {
 			console.log(`FAILURE! ${word} is not a word`)
 			for (const letter of partsOfWord) {
@@ -105,5 +109,32 @@ export default class WordBuilder {
 			.catch((error) => {
 				console.log("Error loading dictionary:", error)
 			})
+	}
+
+	snapWordIntoPlace(wordLetters) {
+		let centerX = 0
+		let centerY = 0
+
+		for (const letter of wordLetters) {
+			centerX += letter.x
+			centerY += letter.y
+		}
+
+		centerX /= wordLetters.length
+		centerY /= wordLetters.length
+
+		const spacing = 35
+
+		for (let i = 0; i < wordLetters.length; i++) {
+			const letter = wordLetters[i]
+			const offset = i - (wordLetters.length - 1) / 2
+
+			const targetX = centerX + offset * spacing
+			const targetY = centerY
+
+			letter.targetX = targetX
+			letter.targetY = targetY
+			letter.hasTarget = true
+		}
 	}
 }
