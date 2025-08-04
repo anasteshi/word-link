@@ -7,6 +7,7 @@ export default class WordBuilder {
 	wordCheckTimeout = null
 	dictionary = new Set()
 	guessedWords = new Set()
+	placedWords = []
 
 	constructor(canvas) {
 		this.canvas = canvas
@@ -18,6 +19,7 @@ export default class WordBuilder {
 	resize() {
 		this.canvas.width = window.innerWidth
 		this.canvas.height = window.innerHeight
+		this.placedWords = []
 	}
 
 	addLetter(letter) {
@@ -28,9 +30,13 @@ export default class WordBuilder {
 		}
 		this.lastTypedTime = now
 
-		const x = Math.random() * this.canvas.width * 0.8 + this.canvas.width * 0.1
+		const margin = 0.1
+		const x =
+			Math.random() * this.canvas.width * (1 - margin * 2) +
+			this.canvas.width * margin
 		const y =
-			Math.random() * this.canvas.height * 0.8 + this.canvas.height * 0.1
+			Math.random() * this.canvas.height * (1 - margin * 2) +
+			this.canvas.height * margin
 		this.letters.push(new Letter(letter, x, y, this.currentWordSequence))
 
 		this.scheduleWordCheck(this.currentWordSequence)
@@ -64,6 +70,8 @@ export default class WordBuilder {
 		const partsOfWord = this.letters.filter(
 			(letter) => letter.sequenceId === sequenceId
 		)
+		if (partsOfWord.length === 0) return
+
 		const word = partsOfWord.map((letter) => letter.letter).join("")
 
 		if (
@@ -75,7 +83,7 @@ export default class WordBuilder {
 				letter.isPartOfWord = true
 			}
 			this.guessedWords.add(word)
-			this.snapWordIntoPlace(partsOfWord)
+			this.findPositionAndSnapWord(partsOfWord)
 		} else {
 			for (const letter of partsOfWord) {
 				letter.invalidWord = true
@@ -106,30 +114,87 @@ export default class WordBuilder {
 			})
 	}
 
-	snapWordIntoPlace(wordLetters) {
-		let centerX = 0
-		let centerY = 0
+	findPositionAndSnapWord(wordLetters) {
+		const letterSize = 40
+		const padding = 5
+		this.ctx.font = `${letterSize}px Times New Roman`
 
+		let totalWordWidth = 0
 		for (const letter of wordLetters) {
-			centerX += letter.x
-			centerY += letter.y
+			totalWordWidth += this.ctx.measureText(letter.letter).width
+		}
+		totalWordWidth += (wordLetters.length - 1) * padding
+
+		const wordHeight = letterSize
+
+		let targetCenterX, targetCenterY
+		let foundPosition = false
+		let attempts = 0
+		const maxAttempts = 50
+
+		let initialX =
+			wordLetters.reduce((sum, l) => sum + l.x, 0) / wordLetters.length
+		let initialY =
+			wordLetters.reduce((sum, l) => sum + l.y, 0) / wordLetters.length
+
+		while (!foundPosition && attempts < maxAttempts) {
+			if (attempts === 0) {
+				targetCenterX = initialX
+				targetCenterY = initialY
+			} else {
+				const margin = 20
+				targetCenterX =
+					Math.random() * (this.canvas.width - totalWordWidth - margin * 2) +
+					totalWordWidth / 2 +
+					margin
+				targetCenterY =
+					Math.random() * (this.canvas.height - wordHeight - margin * 2) +
+					wordHeight / 2 +
+					margin
+			}
+
+			const newWordBox = {
+				x: targetCenterX - totalWordWidth / 2,
+				y: targetCenterY - wordHeight / 2,
+				width: totalWordWidth,
+				height: wordHeight,
+			}
+
+			let isColliding = false
+			for (const placedWord of this.placedWords) {
+				if (
+					newWordBox.x < placedWord.box.x + placedWord.box.width &&
+					newWordBox.x + newWordBox.width > placedWord.box.x &&
+					newWordBox.y < placedWord.box.y + placedWord.box.height &&
+					newWordBox.y + newWordBox.height > placedWord.box.y
+				) {
+					isColliding = true
+					break
+				}
+			}
+
+			if (!isColliding) {
+				foundPosition = true
+				this.placedWords.push({box: newWordBox, letters: wordLetters})
+			}
+			attempts++
 		}
 
-		centerX /= wordLetters.length
-		centerY /= wordLetters.length
+		if (!foundPosition) {
+			targetCenterX = initialX
+			targetCenterY = initialY
+		}
 
-		const spacing = 35
+		let currentX = targetCenterX - totalWordWidth / 2
 
-		for (let i = 0; i < wordLetters.length; i++) {
-			const letter = wordLetters[i]
-			const offset = i - (wordLetters.length - 1) / 2
+		for (const letter of wordLetters) {
+			const letterWidth = this.ctx.measureText(letter.letter).width
 
-			const targetX = centerX + offset * spacing
-			const targetY = centerY
-
-			letter.targetX = targetX
-			letter.targetY = targetY
+			letter.targetX = currentX
+			letter.targetY = targetCenterY
 			letter.hasTarget = true
+
+			currentX += letterWidth + padding
 		}
 	}
 }
