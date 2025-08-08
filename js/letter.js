@@ -94,7 +94,7 @@ export default class Letter {
 
 	drawLetter(ctx) {
 		if (this.isPartOfWord) {
-			ctx.shadowColor = "yellow"
+			ctx.shadowColor = "white"
 			ctx.shadowBlur = 10
 		} else {
 			ctx.shadowColor = "transparent"
