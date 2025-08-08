@@ -8,7 +8,8 @@ window.addEventListener("resize", () => {
 })
 
 window.addEventListener("keydown", (e) => {
-	if (e.key.length === 1 && /^[a-zA-Z]$/.test(e.key)) { // Regex to check if the key is an english letter
+	if (e.key.length === 1 && /^[a-zA-Z]$/.test(e.key)) {
+		// Regex to check if the key is an english letter
 		wordBuilder.addLetter(e.key.toUpperCase())
 	}
 })

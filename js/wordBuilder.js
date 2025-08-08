@@ -133,9 +133,11 @@ export default class WordBuilder {
 		const maxAttempts = 50
 
 		let initialX =
-			wordLetters.reduce((sum, l) => sum + l.x, 0) / wordLetters.length
+			wordLetters.reduce((totalX, letter) => totalX + letter.x, 0) /
+			wordLetters.length
 		let initialY =
-			wordLetters.reduce((sum, l) => sum + l.y, 0) / wordLetters.length
+			wordLetters.reduce((totalY, letter) => totalY + letter.y, 0) /
+			wordLetters.length
 
 		while (!foundPosition && attempts < maxAttempts) {
 			if (attempts === 0) {
